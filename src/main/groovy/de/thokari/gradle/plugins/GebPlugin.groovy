@@ -42,7 +42,7 @@ class GebPlugin implements Plugin<Project> {
 				dest buildDir
 			}
 
-			task('unzipPhantomJs', type: Copy) {
+			task('unzipPhantomJs', type: Copy, dependsOn: downloadPhantomJs) {
 				if(isWindows()) {
 					from zipTree("${buildDir}/${phantomJsArchive}")
 				} else {
@@ -51,7 +51,7 @@ class GebPlugin implements Plugin<Project> {
 				into buildDir
 			}
 
-			task('usePhantomJs')  {
+			task('usePhantomJs', dependsOn: unzipPhantomJs)  {
 
 				System.setProperty 'phantomjs.binary.path', "${buildDir}/${phantomJsArchiveBaseName}/${phantomJsExecutable}"
 				System.setProperty 'geb.build.reportsDir', "$buildDir/geb-plugin-reports"
