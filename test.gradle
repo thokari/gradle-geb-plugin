@@ -1,0 +1,13 @@
+buildscript {
+	repositories { jcenter() }
+	dependencies {
+		classpath 'de.undercouch:gradle-download-task:1.0'
+		classpath "com.github.detro.ghostdriver:phantomjsdriver:${ghostdriverVersion}"
+		classpath "org.gebish:geb-core:${gebVersion}"
+		classpath files("$buildDir/libs/gradle-geb-plugin.jar")
+	}
+}
+
+import de.undercouch.gradle.tasks.download.Download
+
+apply plugin: 'geb'
