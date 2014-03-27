@@ -1,15 +1,23 @@
 package de.thokari.gradle.plugins
 
 
+import geb.Browser
+
+import java.util.logging.Level
+
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
-
+import org.openqa.selenium.WebDriver
+import org.openqa.selenium.logging.LogType
+import org.openqa.selenium.logging.LoggingPreferences
 import org.openqa.selenium.phantomjs.PhantomJSDriver
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
+import org.openqa.selenium.remote.CapabilityType
+import org.openqa.selenium.remote.DesiredCapabilities
 
 import de.undercouch.gradle.tasks.download.Download
 
-import geb.Browser
 
 class GebPlugin implements Plugin<Project> {
 
@@ -57,15 +65,31 @@ class GebPlugin implements Plugin<Project> {
 				System.setProperty 'geb.build.reportsDir', "$buildDir/geb-plugin-reports"
 
 				doLast {
-					def gebBrowser = new Browser(driver: new PhantomJSDriver())
-					gebBrowser.drive {
-						go 'https://www.duckduckgo.com'
-						$('#search_form_input_homepage') << 'wikipedia'
-						$('#search_button_homepage').click()
 
-						println $('a.large')*.text().join('\n')
+					PhantomJSDriver driver = new PhantomJSDriver()
+					driver.setLogLevel(Level.OFF)
+
+					ext {
+						browser = new Browser(driver: driver)
+					}
+					browser.drive {
+						go 'https://www.duckduckgo.com'
+						println $('#tagline_homepage').text()
+						//$('#search_form_input_homepage') << 'wikipedia'
+						//$('#search_button_homepage').click()
+						//println $('a.large')*.text().join('\n')
 					}
 				}
+			}
+
+			project.gradle.buildFinished {
+				try {
+					usePhantomJs.browser.quit()
+				} catch (e) {
+					println "Error when shutting down browser: $e"
+				}
+				//usePhantomJs.driver.quit()
+				//usePhantomJs.browser.quit()
 			}
 		}
 	}
