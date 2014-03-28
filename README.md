@@ -2,8 +2,8 @@ gradle-geb-plugin
 =================
 [![Build Status](https://travis-ci.org/thokari/gradle-geb-plugin.svg?branch=master)](https://travis-ci.org/thokari/gradle-geb-plugin)
 
-Makes a PhantomJS Geb  browser available in Gradle scripts.
 Automatically downloads the [PhantomJS binaries](http://phantomjs.org/download.html) for your OS (currently supporting Linux 64/32 and Windows).
+
 Useful for quick and dirty automation.
 
 Usage
