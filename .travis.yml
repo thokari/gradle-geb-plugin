@@ -3,7 +3,7 @@ env:
 before_script:
   - chmod +x gradlew
 script:
-  - ./gradlew jar
+  - ./gradlew publishToMavenLocal
   - ./gradlew -b test.gradle gDDG
 cache:
   directories:

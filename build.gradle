@@ -1,4 +1,5 @@
 apply plugin: 'groovy'
+apply plugin: 'maven-publish'
 
 repositories { jcenter() }
 
@@ -6,10 +7,24 @@ dependencies {
 	compile gradleApi()
 	compile localGroovy()
 
-	compile 'de.undercouch:gradle-download-task:1.0'
-	compile "com.github.detro.ghostdriver:phantomjsdriver:${ghostdriverVersion}"
-	compile "org.gebish:geb-core:${gebVersion}"
+	def gradleDowloadDep = 'de.undercouch:gradle-download-task:1.0'
+	def ghostdriverDep = "com.github.detro.ghostdriver:phantomjsdriver:${ghostdriverVersion}"
+	def gebDep = "org.gebish:geb-core:${gebVersion}"
+
+	compile gradleDowloadDep
+	compile ghostdriverDep
+	compile gebDep
+
+	runtime gradleDowloadDep
+	runtime ghostdriverDep
+	runtime gebDep
 }
 
 group = 'de.thokari'
 version = '0.1'
+
+publishing {
+	publications {
+		maven(MavenPublication) { from components.java }
+	}
+}
