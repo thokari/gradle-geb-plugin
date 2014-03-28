@@ -8,7 +8,7 @@ buildscript {
 
 apply plugin: 'geb'
 
-task('goDuckDuckGo', type: GebTask) << {
+task goDuckDuckGo(type: GebTask) << {
 
 	drive {
 		go 'https://www.duckduckgo.com'

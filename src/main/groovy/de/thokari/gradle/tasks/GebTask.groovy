@@ -7,7 +7,8 @@ class GebTask extends DefaultTask {
 
 	public Browser drive(Closure clos) {
 		Browser browser = project.geb.browser
-		browser.drive(clos)
+		clos.delegate = browser
+		clos.call()
 		browser
 	}
 }

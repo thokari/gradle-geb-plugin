@@ -82,7 +82,7 @@ class GebPlugin implements Plugin<Project> {
 	}
 
 	def under32BitLinux(Closure clos) {
-		if(System.properties['os.arch'] =~ 'x86') {
+		if(System.properties['os.arch'] ==~ '.*x86.*') {
 			clos.call()
 		}
 	}
