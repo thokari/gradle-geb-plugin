@@ -20,11 +20,19 @@ dependencies {
 	runtime gebDep
 }
 
+task sourceJar(type: Jar) {
+	from sourceSets.main.java
+	classifier = 'sources'
+}
+
 group = 'de.thokari'
 version = '0.1'
 
 publishing {
 	publications {
-		maven(MavenPublication) { from components.java }
+		maven(MavenPublication) {
+			from components.java
+			artifact sourceJar
+		}
 	}
 }

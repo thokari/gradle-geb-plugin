@@ -1,8 +1,5 @@
 buildscript {
-	repositories {
-		mavenLocal()
-		jcenter()
-	}
+	repositories { jcenter() }
 	dependencies { classpath "de.thokari:gradle-geb-plugin:0.1" }
 }
 
