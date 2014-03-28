@@ -3,6 +3,7 @@ buildscript {
 	dependencies {
 		classpath 'de.undercouch:gradle-download-task:1.0'
 		classpath "com.github.detro.ghostdriver:phantomjsdriver:${ghostdriverVersion}"
+		classpath "org.seleniumhq.selenium:selenium-java:${seleniumVersion}"
 		classpath "org.gebish:geb-core:${gebVersion}"
 		classpath files("$buildDir/libs/gradle-geb-plugin-0.1.jar")
 	}
