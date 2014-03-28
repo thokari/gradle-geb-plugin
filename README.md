@@ -8,7 +8,7 @@ Useful for quick and dirty automation.
 
 Usage
 ---------
-```
+```groovy
 buildscript {
 	repositories { jcenter() }
 	dependencies { classpath "de.thokari:gradle-geb-plugin:0.1" }
