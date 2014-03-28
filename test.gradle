@@ -8,6 +8,15 @@ buildscript {
 	}
 }
 
-import de.undercouch.gradle.tasks.download.Download
-
 apply plugin: 'geb'
+
+task('goDuckDuckGo', type: GebTask) << {
+
+	drive {
+		go 'https://www.duckduckgo.com'
+		println $('#tagline_homepage').text()
+		$('#search_form_input_homepage') << 'wikipedia'
+		$('#search_button_homepage').click()
+		println $('a.large')*.text().join('\n')
+	}
+}

@@ -1,21 +1,11 @@
 package de.thokari.gradle.plugins
 
 
-import geb.Browser
-
-import java.util.logging.Level
-
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.logging.LogType
-import org.openqa.selenium.logging.LoggingPreferences
-import org.openqa.selenium.phantomjs.PhantomJSDriver
-import org.openqa.selenium.phantomjs.PhantomJSDriverService;
-import org.openqa.selenium.remote.CapabilityType
-import org.openqa.selenium.remote.DesiredCapabilities
 
+import de.thokari.gradle.extensions.GebExtension
 import de.undercouch.gradle.tasks.download.Download
 
 
@@ -44,6 +34,12 @@ class GebPlugin implements Plugin<Project> {
 				phantomJsDownloadUrl = "${phantomJsDownloadBaseUrl}/${phantomJsArchive}"
 			}
 
+			extensions.create 'geb', GebExtension, project
+
+			ext {
+				GebTask = de.thokari.gradle.tasks.GebTask
+			}
+
 			task('downloadPhantomJs', type: Download) {
 				overwrite false
 				src phantomJsDownloadUrl
@@ -59,37 +55,18 @@ class GebPlugin implements Plugin<Project> {
 				into buildDir
 			}
 
-			task('usePhantomJs', dependsOn: unzipPhantomJs)  {
-
-				System.setProperty 'phantomjs.binary.path', "${buildDir}/${phantomJsArchiveBaseName}/${phantomJsExecutable}"
-				System.setProperty 'geb.build.reportsDir', "$buildDir/geb-plugin-reports"
-
-				doLast {
-
-					PhantomJSDriver driver = new PhantomJSDriver()
-					driver.setLogLevel(Level.OFF)
-
-					ext {
-						browser = new Browser(driver: driver)
-					}
-					browser.drive {
-						go 'https://www.duckduckgo.com'
-						println $('#tagline_homepage').text()
-						//$('#search_form_input_homepage') << 'wikipedia'
-						//$('#search_button_homepage').click()
-						//println $('a.large')*.text().join('\n')
-					}
-				}
+			afterEvaluate {
+				tasks.withType(de.thokari.gradle.tasks.GebTask) { task -> task.dependsOn unzipPhantomJs }
 			}
 
-			project.gradle.buildFinished {
-				try {
-					usePhantomJs.browser.quit()
-				} catch (e) {
-					println "Error when shutting down browser: $e"
+			gradle.buildFinished {
+				if(geb.usedBrowser) {
+					try {
+						geb.browser.quit()
+					} catch (e) {
+						println "Error when shutting down browser: $e"
+					}
 				}
-				//usePhantomJs.driver.quit()
-				//usePhantomJs.browser.quit()
 			}
 		}
 	}
