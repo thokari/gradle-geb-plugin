@@ -13,23 +13,72 @@ class GebExtension {
 	final static String GEB_REPORTS_DIR_KEY = 'geb.build.reportsDir'
 	final static String DEFAULT_GEB_REPORTS_DIR = 'geb-plugin-reports'
 
+	final static String PHANTOM_JS_DEFAULT_DOWNLOAD_BASE_URL = 'https://bitbucket.org/ariya/phantomjs/downloads'
+	final static String PHANTOM_JS_DEFAULT_VERSION = '1.9.7'
+
 	Project project
+
+	String phantomJsVersion
+	String phantomJsDownloadBaseUrl
+
+	String phantomJsArchiveBaseName
+	String phantomJsArchiveExtension
+	String phantomJsExecutable
+	String phantomJsArchive
+
+	String phantomJsDownloadUrl
+	String phantomJsUnzipDir
 
 	String phantomJsBinaryPath
 	String gebReportsDir
 	Level logLevel
+
 	Browser browser
 	boolean usedBrowser = false
 
 	public GebExtension(Project project) {
 
 		this.project = project
-		this.logLevel = Level.OFF
-		setPhantomJsBinaryPath "${project.buildDir}/${project.phantomJsArchiveBaseName}/${project.phantomJsExecutable}"
+
+		phantomJsArchiveExtension = 'tar.bz2'
+		phantomJsExecutable = 'bin/phantomjs'
+
+		logLevel = Level.OFF
+
+		setPhantomJsVersion PHANTOM_JS_DEFAULT_VERSION
+		setPhantomJsDownloadBaseUrl PHANTOM_JS_DEFAULT_DOWNLOAD_BASE_URL
+
 		setGebReportsDir "${project.buildDir}/${DEFAULT_GEB_REPORTS_DIR}"
+		setPhantomJsUnzipDir "${project.buildDir}/${phantomJsArchiveBaseName}"
 	}
 
-	public void setPhantomJsBinaryPath(path) {
+	public void setPhantomJsVersion(version) {
+		phantomJsVersion = version
+		phantomJsArchiveBaseName = "phantomjs-${version}-linux-x86_64"
+
+		if(isWindows()) {
+			phantomJsArchiveBaseName = "phantomjs-${version}-windows"
+			phantomJsArchiveExtension = 'zip'
+			phantomJsExecutable = 'phantomjs.exe'
+		}
+		if(is32BitLinux()) {
+			phantomJsArchiveBaseName = "phantomjs-${version}-linux-i686"
+		}
+
+		phantomJsArchive = "${phantomJsArchiveBaseName}.${phantomJsArchiveExtension}"
+	}
+
+	public void setPhantomJsDownloadBaseUrl(url) {
+		phantomJsDownloadBaseUrl = url
+		phantomJsDownloadUrl = "${phantomJsDownloadBaseUrl}/${phantomJsArchive}"
+	}
+
+	public void setPhantomJsUnzipDir(dir) {
+		phantomJsUnzipDir = dir
+		setPhantomJsBinaryPath "${phantomJsUnzipDir}/${phantomJsExecutable}"
+	}
+
+	private void setPhantomJsBinaryPath(path) {
 		phantomJsBinaryPath = path
 		System.setProperty PHANTOM_JS_BINARY_PATH_KEY, phantomJsBinaryPath
 	}
@@ -47,5 +96,17 @@ class GebExtension {
 			usedBrowser = true
 		}
 		browser
+	}
+
+	private def isMacOs() {
+		System.properties['os.name'].toLowerCase().contains('mac os')
+	}
+
+	private def isWindows() {
+		System.properties['os.name'] ==~ '[W|w]indows.*'
+	}
+
+	private def is32BitLinux() {
+		System.properties['os.arch'] ==~ '.*x86.*'
 	}
 }

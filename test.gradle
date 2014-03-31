@@ -8,6 +8,8 @@ buildscript {
 
 apply plugin: 'geb'
 
+import de.thokari.gradle.tasks.GebTask
+
 task goDuckDuckGo(type: GebTask) << {
 
 	drive {

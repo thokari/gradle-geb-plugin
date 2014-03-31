@@ -1,3 +1,5 @@
+import javax.security.auth.login.ConfigurationSpi;
+
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 
@@ -12,11 +14,11 @@ dependencies {
 	def gebDep = "org.gebish:geb-core:${gebVersion}"
 
 	compile gradleDowloadDep
-	compile ghostdriverDep
+	compile(ghostdriverDep) { exclude group: "org.seleniumhq.selenium", module: "selenium-java"}
 	compile gebDep
 
 	runtime gradleDowloadDep
-	runtime ghostdriverDep
+	runtime(ghostdriverDep) { exclude group: "org.seleniumhq.selenium", module: "selenium-java"}
 	runtime gebDep
 }
 
@@ -33,6 +35,24 @@ publishing {
 		maven(MavenPublication) {
 			from components.java
 			artifact sourceJar
+
+			project.configurations[JavaPlugin.RUNTIME_CONFIGURATION_NAME].allDependencies.findAll {
+				it instanceof ModuleDependency && !it.excludeRules.isEmpty()
+			}.each { ModuleDependency dep ->
+				pom.withXml {
+					def xmlDep = asNode().dependencies.dependency.find {
+						it.groupId[0].text() == dep.group && it.artifactId[0].text() == dep.name
+					}
+					def xmlExclusions = xmlDep.exclusions[0]
+					if (!xmlExclusions) xmlExclusions = xmlDep.appendNode('exclusions')
+
+					dep.excludeRules.each { ExcludeRule rule ->
+						def xmlExclusion = xmlExclusions.appendNode('exclusion')
+						xmlExclusion.appendNode('groupId', rule.group)
+						xmlExclusion.appendNode('artifactId', rule.module)
+					}
+				}
+			}
 		}
 	}
 }
