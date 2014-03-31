@@ -30,7 +30,7 @@ class GebPlugin implements Plugin<Project> {
 					} else {
 						from tarTree("${buildDir}/${geb.phantomJsArchive}")
 					}
-					into geb.phantomJsUnzipDir
+					into (geb.phantomJsUnzipDir - geb.phantomJsArchiveBaseName)
 				}
 
 				tasks.withType(GebTask) { task -> task.dependsOn unzipPhantomJs }
