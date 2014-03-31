@@ -16,10 +16,12 @@ Usage
 ```groovy
 buildscript {
 	repositories { jcenter() }
-	dependencies { classpath "de.thokari:gradle-geb-plugin:0.1" }
+	dependencies { classpath "de.thokari:gradle-geb-plugin:0.2" }
 }
 
 apply plugin: 'geb'
+
+import de.thokari.gradle.tasks.*
 
 task duckDuckGoSearch(type: GebTask) << {
 
