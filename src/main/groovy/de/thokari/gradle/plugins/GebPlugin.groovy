@@ -7,6 +7,9 @@ import de.thokari.gradle.extensions.GebExtension
 import de.thokari.gradle.tasks.GebTask
 import de.undercouch.gradle.tasks.download.Download
 
+import static de.thokari.gradle.utils.OsUtils.isMacOs
+import static de.thokari.gradle.utils.OsUtils.isWindows
+
 class GebPlugin implements Plugin<Project> {
 
 	@Override
@@ -25,7 +28,7 @@ class GebPlugin implements Plugin<Project> {
 				}
 
 				task('unzipPhantomJs', type: Copy, dependsOn: downloadPhantomJs) {
-					if(isWindows()) {
+					if(isWindows() || isMacOs()) {
 						from zipTree("${buildDir}/${geb.phantomJsArchive}")
 					} else {
 						from tarTree("${buildDir}/${geb.phantomJsArchive}")
@@ -46,9 +49,5 @@ class GebPlugin implements Plugin<Project> {
 				}
 			}
 		}
-	}
-
-	private def isWindows() {
-		System.properties['os.name'] ==~ '[W|w]indows.*'
 	}
 }

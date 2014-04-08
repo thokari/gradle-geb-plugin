@@ -7,6 +7,10 @@ import java.util.logging.Level
 import org.gradle.api.Project
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 
+import static de.thokari.gradle.utils.OsUtils.is32BitLinux
+import static de.thokari.gradle.utils.OsUtils.isMacOs
+import static de.thokari.gradle.utils.OsUtils.isWindows
+
 class GebExtension {
 
 	final static String PHANTOM_JS_BINARY_PATH_KEY = 'phantomjs.binary.path'
@@ -60,11 +64,12 @@ class GebExtension {
 			phantomJsArchiveBaseName = "phantomjs-${version}-windows"
 			phantomJsArchiveExtension = 'zip'
 			phantomJsExecutable = 'phantomjs.exe'
-		}
-		if(is32BitLinux()) {
+		}else if(isMacOs()){
+            phantomJsArchiveBaseName = "phantomjs-${version}-macosx"
+            phantomJsArchiveExtension = 'zip'
+        }else if(is32BitLinux()) {
 			phantomJsArchiveBaseName = "phantomjs-${version}-linux-i686"
 		}
-
 		phantomJsArchive = "${phantomJsArchiveBaseName}.${phantomJsArchiveExtension}"
 	}
 
@@ -96,17 +101,5 @@ class GebExtension {
 			usedBrowser = true
 		}
 		browser
-	}
-
-	private def isMacOs() {
-		System.properties['os.name'].toLowerCase().contains('mac os')
-	}
-
-	private def isWindows() {
-		System.properties['os.name'] ==~ '[W|w]indows.*'
-	}
-
-	private def is32BitLinux() {
-		System.properties['os.arch'] ==~ '.*x86.*'
 	}
 }
