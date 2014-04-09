@@ -16,7 +16,7 @@ Usage
 ```groovy
 buildscript {
 	repositories { jcenter() }
-	dependencies { classpath "de.thokari:gradle-geb-plugin:0.2" }
+	dependencies { classpath "de.thokari:gradle-geb-plugin:0.3" }
 }
 
 apply plugin: 'geb'

@@ -64,10 +64,10 @@ class GebExtension {
 			phantomJsArchiveBaseName = "phantomjs-${version}-windows"
 			phantomJsArchiveExtension = 'zip'
 			phantomJsExecutable = 'phantomjs.exe'
-		}else if(isMacOs()){
-            phantomJsArchiveBaseName = "phantomjs-${version}-macosx"
-            phantomJsArchiveExtension = 'zip'
-        }else if(is32BitLinux()) {
+		} else if(isMacOs()) {
+			phantomJsArchiveBaseName = "phantomjs-${version}-macosx"
+			phantomJsArchiveExtension = 'zip'
+		} else if(is32BitLinux()) {
 			phantomJsArchiveBaseName = "phantomjs-${version}-linux-i686"
 		}
 		phantomJsArchive = "${phantomJsArchiveBaseName}.${phantomJsArchiveExtension}"
