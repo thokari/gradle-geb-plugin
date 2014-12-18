@@ -6,6 +6,8 @@ import java.util.logging.Level
 
 import org.gradle.api.Project
 import org.openqa.selenium.phantomjs.PhantomJSDriver
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import static de.thokari.gradle.utils.OsUtils.is32BitLinux
 import static de.thokari.gradle.utils.OsUtils.isMacOs
@@ -13,8 +15,6 @@ import static de.thokari.gradle.utils.OsUtils.isWindows
 
 class GebExtension {
 
-	final static String PHANTOM_JS_BINARY_PATH_KEY = 'phantomjs.binary.path'
-	final static String GEB_REPORTS_DIR_KEY = 'geb.build.reportsDir'
 	final static String DEFAULT_GEB_REPORTS_DIR = 'geb-plugin-reports'
 
 	final static String PHANTOM_JS_DEFAULT_DOWNLOAD_BASE_URL = 'https://bitbucket.org/ariya/phantomjs/downloads'
@@ -84,20 +84,31 @@ class GebExtension {
 
 	private void setPhantomJsBinaryPath(path) {
 		phantomJsBinaryPath = path
-		System.setProperty PHANTOM_JS_BINARY_PATH_KEY, phantomJsBinaryPath
 	}
 
 	public void setGebReportsDir(path) {
 		gebReportsDir = path
-		System.setProperty GEB_REPORTS_DIR_KEY, gebReportsDir
 	}
 
 	public Browser getBrowser() {
-		if(!browser) {
-			PhantomJSDriver driver = new PhantomJSDriver()
-			driver.setLogLevel logLevel
-			browser = new Browser(driver: driver)
+		if(!browser) {		    
 			usedBrowser = true
+			DesiredCapabilities desiredCapabilities = new DesiredCapabilities()
+			desiredCapabilities.setCapability(
+				PhantomJSDriverService.PHANTOMJS_CLI_ARGS, 
+				[ "--web-security=false",
+				  "--ssl-protocol=any",
+				  "--ignore-ssl-errors=true",
+		        ]
+			);
+			desiredCapabilities.setCapability(
+				PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY,
+				phantomJsBinaryPath
+			)
+			
+		    PhantomJSDriver driver = new PhantomJSDriver(desiredCapabilities)			
+			browser = new Browser(driver: driver)
+			browser.config.reportsDir = new File(gebReportsDir)			
 		}
 		browser
 	}
