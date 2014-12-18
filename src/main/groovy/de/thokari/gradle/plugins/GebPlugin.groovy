@@ -16,6 +16,8 @@ class GebPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 
 		project.with {
+			
+			project.apply plugin:"base"
 
 			extensions.create 'geb', GebExtension, project
 
