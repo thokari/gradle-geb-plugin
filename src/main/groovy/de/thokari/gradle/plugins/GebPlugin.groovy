@@ -25,7 +25,7 @@ class GebPlugin implements Plugin<Project> {
 			afterEvaluate {
 				def topLevelProject = project
 				while (topLevelProject.parent != null) {
-					topLevelProject = project
+					topLevelProject = topLevelProject.parent
 				}
 				
 				Copy unzipPhantomJs 
