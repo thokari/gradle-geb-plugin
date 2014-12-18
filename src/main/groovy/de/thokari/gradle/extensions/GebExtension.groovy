@@ -6,6 +6,8 @@ import java.util.logging.Level
 
 import org.gradle.api.Project
 import org.openqa.selenium.phantomjs.PhantomJSDriver
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 import static de.thokari.gradle.utils.OsUtils.is32BitLinux
 import static de.thokari.gradle.utils.OsUtils.isMacOs
@@ -94,11 +96,19 @@ class GebExtension {
 	}
 
 	public Browser getBrowser() {
-		if(!browser) {
-			PhantomJSDriver driver = new PhantomJSDriver()
-			driver.setLogLevel logLevel
-			browser = new Browser(driver: driver)
+		if(!browser) {		    
 			usedBrowser = true
+			DesiredCapabilities desiredCapabilities = new DesiredCapabilities()
+			desiredCapabilities.setCapability(
+				PhantomJSDriverService.PHANTOMJS_CLI_ARGS, 
+				[ "--web-security=false",
+				  "--ssl-protocol=any",
+				  "--ignore-ssl-errors=true",
+		        ]
+			);
+		    		
+		    PhantomJSDriver driver = new PhantomJSDriver(desiredCapabilities)		    
+			browser = new Browser(driver: driver)				
 		}
 		browser
 	}
