@@ -14,9 +14,10 @@ task goDuckDuckGo(type: GebTask) << {
 
 	drive {
 		go 'https://www.duckduckgo.com'
-		println $('#tagline_homepage').text()
+		assert $('#tagline_homepage')
 		$('#search_form_input_homepage') << 'wikipedia'
-		$('#search_button_homepage').click()
+		assert $('#search_button_homepage').click()
 		println $('a.large')*.text().join('\n')
+        report "search results"
 	}
 }

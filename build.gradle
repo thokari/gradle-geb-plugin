@@ -3,6 +3,7 @@ import javax.security.auth.login.ConfigurationSpi;
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
 apply plugin: 'idea'
+apply plugin: 'eclipse'
 
 repositories { jcenter() }
 
