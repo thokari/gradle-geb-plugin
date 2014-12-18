@@ -53,7 +53,6 @@ class GebExtension {
 		setPhantomJsDownloadBaseUrl PHANTOM_JS_DEFAULT_DOWNLOAD_BASE_URL
 
 		setGebReportsDir "${project.buildDir}/${DEFAULT_GEB_REPORTS_DIR}"
-		setPhantomJsUnzipDir "${project.buildDir}/${phantomJsArchiveBaseName}"
 	}
 
 	public void setPhantomJsVersion(version) {

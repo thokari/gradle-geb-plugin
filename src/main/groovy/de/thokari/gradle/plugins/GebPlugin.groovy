@@ -2,11 +2,12 @@ package de.thokari.gradle.plugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task;
 import org.gradle.api.tasks.Copy
+
 import de.thokari.gradle.extensions.GebExtension
 import de.thokari.gradle.tasks.GebTask
 import de.undercouch.gradle.tasks.download.Download
-
 import static de.thokari.gradle.utils.OsUtils.isMacOs
 import static de.thokari.gradle.utils.OsUtils.isWindows
 
@@ -22,22 +23,33 @@ class GebPlugin implements Plugin<Project> {
 			extensions.create 'geb', GebExtension, project
 
 			afterEvaluate {
-
-				task('downloadPhantomJs', type: Download) {
-					overwrite false
-					src geb.phantomJsDownloadUrl
-					dest buildDir
+				def topLevelProject = project
+				while (topLevelProject.parent != null) {
+					topLevelProject = project
 				}
-
-				task('unzipPhantomJs', type: Copy, dependsOn: downloadPhantomJs) {
-					if(isWindows() || isMacOs()) {
-						from zipTree("${buildDir}/${geb.phantomJsArchive}")
-					} else {
-						from tarTree("${buildDir}/${geb.phantomJsArchive}")
+				
+				Copy unzipPhantomJs 
+				if ( topLevelProject.tasks.find { it.name == "unzipPhantomJs" }) {
+						unzipPhantomJs = topLevelProject.tasks.unzipPhantomJs
+				} else {
+					topLevelProject.task('downloadPhantomJs', type: Download) {
+						overwrite false
+						src geb.phantomJsDownloadUrl
+						dest topLevelProject.buildDir
 					}
-					into (geb.phantomJsUnzipDir - geb.phantomJsArchiveBaseName)
-				}
-
+	
+					unzipPhantomJs = topLevelProject.task('unzipPhantomJs', 
+						type: Copy, dependsOn: topLevelProject.tasks.downloadPhantomJs
+					) {
+						if(isWindows() || isMacOs()) {
+							from zipTree("${topLevelProject.buildDir}/${geb.phantomJsArchive}")
+						} else {
+							from tarTree("${topLevelProject.buildDir}/${geb.phantomJsArchive}")
+						}
+						into topLevelProject.buildDir
+					}		
+				}				
+				geb.setPhantomJsUnzipDir "${unzipPhantomJs.destinationDir}/${geb.phantomJsArchiveBaseName}"				
 				tasks.withType(GebTask) { task -> task.dependsOn unzipPhantomJs }
 			}
 
