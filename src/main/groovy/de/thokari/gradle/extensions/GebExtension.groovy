@@ -5,6 +5,7 @@ import geb.Browser
 import java.util.logging.Level
 
 import org.gradle.api.Project
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -107,7 +108,8 @@ class GebExtension {
 				phantomJsBinaryPath
 			)
 			
-		    PhantomJSDriver driver = new PhantomJSDriver(desiredCapabilities)			
+		    PhantomJSDriver driver = new PhantomJSDriver(desiredCapabilities)
+			driver.manage().window().setSize(new Dimension(1028, 768))
 			browser = new Browser(driver: driver)
 			browser.config.reportsDir = new File(gebReportsDir)			
 		}
