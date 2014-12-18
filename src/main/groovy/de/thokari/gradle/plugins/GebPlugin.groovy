@@ -28,29 +28,11 @@ class GebPlugin implements Plugin<Project> {
 					topLevelProject = topLevelProject.parent
 				}
 				
-				Copy unzipPhantomJs 
-				if ( topLevelProject.tasks.find { it.name == "unzipPhantomJs" }) {
-						unzipPhantomJs = topLevelProject.tasks.unzipPhantomJs
-				} else {
-					topLevelProject.task('downloadPhantomJs', type: Download) {
-						overwrite false
-						src geb.phantomJsDownloadUrl
-						dest topLevelProject.buildDir
-					}
-	
-					unzipPhantomJs = topLevelProject.task('unzipPhantomJs', 
-						type: Copy, dependsOn: topLevelProject.tasks.downloadPhantomJs
-					) {
-						if(isWindows() || isMacOs()) {
-							from zipTree("${topLevelProject.buildDir}/${geb.phantomJsArchive}")
-						} else {
-							from tarTree("${topLevelProject.buildDir}/${geb.phantomJsArchive}")
-						}
-						into topLevelProject.buildDir
-					}		
-				}				
-				geb.setPhantomJsUnzipDir "${unzipPhantomJs.destinationDir}/${geb.phantomJsArchiveBaseName}"				
+				Copy unzipPhantomJs = findOrCreateUnzipTask(topLevelProject, geb)
+																
 				tasks.withType(GebTask) { task -> task.dependsOn unzipPhantomJs }
+				
+				geb.setPhantomJsUnzipDir "${unzipPhantomJs.destinationDir}/${geb.phantomJsArchiveBaseName}"
 			}
 
 			gradle.buildFinished {
@@ -62,6 +44,28 @@ class GebPlugin implements Plugin<Project> {
 					}
 				}
 			}
+		}
+	}
+
+	def Task findOrCreateUnzipTask(Project topLevelProject, GebExtension geb) {
+		if ( topLevelProject.tasks.find { it.name == "unzipPhantomJs" } ) {
+			return topLevelProject.tasks.unzipPhantomJs
+		} else {
+			topLevelProject.task('downloadPhantomJs', type: Download) {
+				overwrite false
+				src geb.phantomJsDownloadUrl
+				dest topLevelProject.buildDir
+			}
+	
+			return topLevelProject.task('unzipPhantomJs',	type: Copy) {
+				dependsOn topLevelProject.tasks.downloadPhantomJs
+				if(isWindows() || isMacOs()) {
+					from topLevelProject.zipTree("${topLevelProject.buildDir}/${geb.phantomJsArchive}")
+				} else {
+					from topLevelProject.tarTree("${topLevelProject.buildDir}/${geb.phantomJsArchive}")
+				}
+				into "topLevelProject.buildDir"
+			}			
 		}
 	}
 }
