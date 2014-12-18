@@ -64,7 +64,7 @@ class GebPlugin implements Plugin<Project> {
 				} else {
 					from topLevelProject.tarTree("${topLevelProject.buildDir}/${geb.phantomJsArchive}")
 				}
-				into "topLevelProject.buildDir"
+				into "${topLevelProject.buildDir}/phantomJs"
 			}			
 		}
 	}
