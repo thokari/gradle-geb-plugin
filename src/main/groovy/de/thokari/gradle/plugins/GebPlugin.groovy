@@ -2,11 +2,12 @@ package de.thokari.gradle.plugins
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.Task;
 import org.gradle.api.tasks.Copy
+
 import de.thokari.gradle.extensions.GebExtension
 import de.thokari.gradle.tasks.GebTask
 import de.undercouch.gradle.tasks.download.Download
-
 import static de.thokari.gradle.utils.OsUtils.isMacOs
 import static de.thokari.gradle.utils.OsUtils.isWindows
 
@@ -16,27 +17,22 @@ class GebPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 
 		project.with {
+			
+			project.apply plugin:"base"
 
 			extensions.create 'geb', GebExtension, project
 
 			afterEvaluate {
-
-				task('downloadPhantomJs', type: Download) {
-					overwrite false
-					src geb.phantomJsDownloadUrl
-					dest buildDir
+				def topLevelProject = project
+				while (topLevelProject.parent != null) {
+					topLevelProject = topLevelProject.parent
 				}
-
-				task('unzipPhantomJs', type: Copy, dependsOn: downloadPhantomJs) {
-					if(isWindows() || isMacOs()) {
-						from zipTree("${buildDir}/${geb.phantomJsArchive}")
-					} else {
-						from tarTree("${buildDir}/${geb.phantomJsArchive}")
-					}
-					into (geb.phantomJsUnzipDir - geb.phantomJsArchiveBaseName)
-				}
-
+				
+				Copy unzipPhantomJs = findOrCreateUnzipTask(topLevelProject, geb)
+																
 				tasks.withType(GebTask) { task -> task.dependsOn unzipPhantomJs }
+				
+				geb.setPhantomJsUnzipDir "${unzipPhantomJs.destinationDir}/${geb.phantomJsArchiveBaseName}"
 			}
 
 			gradle.buildFinished {
@@ -48,6 +44,28 @@ class GebPlugin implements Plugin<Project> {
 					}
 				}
 			}
+		}
+	}
+
+	def Task findOrCreateUnzipTask(Project topLevelProject, GebExtension geb) {
+		if ( topLevelProject.tasks.find { it.name == "unzipPhantomJs" } ) {
+			return topLevelProject.tasks.unzipPhantomJs
+		} else {
+			topLevelProject.task('downloadPhantomJs', type: Download) {
+				overwrite false
+				src geb.phantomJsDownloadUrl
+				dest topLevelProject.buildDir
+			}
+	
+			return topLevelProject.task('unzipPhantomJs',	type: Copy) {
+				dependsOn topLevelProject.tasks.downloadPhantomJs
+				if(isWindows() || isMacOs()) {
+					from topLevelProject.zipTree("${topLevelProject.buildDir}/${geb.phantomJsArchive}")
+				} else {
+					from topLevelProject.tarTree("${topLevelProject.buildDir}/${geb.phantomJsArchive}")
+				}
+				into "${topLevelProject.buildDir}/phantomJs"
+			}			
 		}
 	}
 }
