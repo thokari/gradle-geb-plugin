@@ -1,7 +1,6 @@
-import javax.security.auth.login.ConfigurationSpi;
-
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
+apply plugin: 'ivy-publish'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 
@@ -9,19 +8,25 @@ repositories { jcenter() }
 
 dependencies {
 	compile gradleApi()
-	compile localGroovy()
 
-	def gradleDowloadDep = 'de.undercouch:gradle-download-task:1.0'
-	def ghostdriverDep = "com.github.detro.ghostdriver:phantomjsdriver:${ghostdriverVersion}"
+	def gradleDowloadDep = 'de.undercouch:gradle-download-task:3.1.0'
+	def phantomJsDriverDep = "com.codeborne:phantomjsdriver:${phantomJsDriverVersion}"
 	def gebDep = "org.gebish:geb-core:${gebVersion}"
 
+	compile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
+
 	compile gradleDowloadDep
-	compile(ghostdriverDep) { exclude group: "org.seleniumhq.selenium", module: "selenium-java"}
+	compile(phantomJsDriverDep) {  transitive = false }
 	compile gebDep
 
 	runtime gradleDowloadDep
-	runtime(ghostdriverDep) { exclude group: "org.seleniumhq.selenium", module: "selenium-java"}
+	runtime(phantomJsDriverDep) {  transitive = false }
 	runtime gebDep
+}
+
+// gradle pulls in groovy dependency
+configurations {
+    all*.exclude group: 'org.codehaus.groovy', module: 'groovy-all'
 }
 
 task sourceJar(type: Jar) {
@@ -30,10 +35,14 @@ task sourceJar(type: Jar) {
 }
 
 group = 'de.thokari'
-version = '0.3-SNAPSHOT'
+version = '0.4-SNAPSHOT'
 
 publishing {
 	publications {
+		ivy(IvyPublication) {
+			from components.java
+			artifact sourceJar
+		}
 		maven(MavenPublication) {
 			from components.java
 			artifact sourceJar
@@ -57,4 +66,8 @@ publishing {
 			}
 		}
 	}
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.14'
 }

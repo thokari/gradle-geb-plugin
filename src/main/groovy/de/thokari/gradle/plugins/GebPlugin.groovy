@@ -17,7 +17,7 @@ class GebPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 
 		project.with {
-			
+
 			project.apply plugin:"base"
 
 			extensions.create 'geb', GebExtension, project
@@ -27,16 +27,16 @@ class GebPlugin implements Plugin<Project> {
 				while (topLevelProject.parent != null) {
 					topLevelProject = topLevelProject.parent
 				}
-				
+
 				Copy unzipPhantomJs = findOrCreateUnzipTask(topLevelProject, geb)
-																
+
 				tasks.withType(GebTask) { task -> task.dependsOn unzipPhantomJs }
-				
+
 				geb.setPhantomJsUnzipDir "${unzipPhantomJs.destinationDir}/${geb.phantomJsArchiveBaseName}"
 			}
 
 			gradle.buildFinished {
-				if(geb.usedBrowser) {
+				if (geb.usedBrowser) {
 					try {
 						geb.browser.quit()
 					} catch (e) {
@@ -56,7 +56,7 @@ class GebPlugin implements Plugin<Project> {
 				src geb.phantomJsDownloadUrl
 				dest topLevelProject.buildDir
 			}
-	
+
 			return topLevelProject.task('unzipPhantomJs',	type: Copy) {
 				dependsOn topLevelProject.tasks.downloadPhantomJs
 				if(isWindows() || isMacOs()) {
@@ -65,7 +65,7 @@ class GebPlugin implements Plugin<Project> {
 					from topLevelProject.tarTree("${topLevelProject.buildDir}/${geb.phantomJsArchive}")
 				}
 				into "${topLevelProject.buildDir}/phantomJs"
-			}			
+			}
 		}
 	}
 }

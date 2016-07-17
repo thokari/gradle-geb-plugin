@@ -3,7 +3,7 @@ buildscript {
 		mavenLocal()
 		jcenter()
 	}
-	dependencies { classpath "de.thokari:gradle-geb-plugin:0.3-SNAPSHOT" }
+	dependencies { classpath "de.thokari:gradle-geb-plugin:0.4-SNAPSHOT" }
 }
 
 apply plugin: 'geb'
@@ -14,9 +14,9 @@ task goDuckDuckGo(type: GebTask) << {
 
 	drive {
 		go 'https://www.duckduckgo.com'
-		println $('#tagline_homepage').text()
+		println $('#logo_homepage_link').text()
 		$('#search_form_input_homepage') << 'wikipedia'
 		$('#search_button_homepage').click()
-		println $('a.large')*.text().join('\n')
+		println $('h2.result__title')*.text().join('\n')
 	}
 }

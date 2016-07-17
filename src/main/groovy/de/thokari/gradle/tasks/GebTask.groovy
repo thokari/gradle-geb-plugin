@@ -8,21 +8,20 @@ class GebTask extends DefaultTask {
 	public Browser getBrowser() {
 		project.geb.browser
 	}
-	
+
 	public Browser drive(Closure clos) {
-		try{
+		try {
 			clos.delegate = browser
 			clos.call()
 			browser
-		}
-		catch (Throwable why) {
+		} catch (Throwable why) {
 			try {
-				browser.report "Exception encoutnered"
+				browser.report "Exception encountered"
 			}
 			catch (Throwable all) {
 				project.logger.error("Failed to generate report after exception", all)
 			}
 			throw why
-		}		
+		}
 	}
 }
