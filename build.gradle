@@ -35,7 +35,7 @@ task sourceJar(type: Jar) {
 }
 
 group = 'de.thokari'
-version = '0.4-SNAPSHOT'
+version = '0.6-SNAPSHOT'
 
 publishing {
 	publications {
